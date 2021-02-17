@@ -1,0 +1,56 @@
+.App {
+  text-align: center;
+}
+
+.App-logo {
+  height: 40vmin;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .App-logo {
+    animation: App-logo-spin infinite 20s linear;
+  }
+}
+
+.App-header {
+  background-color: #282c34;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: white;
+}
+
+.App-link {
+  color: #61dafb;
+}
+
+.create-task-modal {
+  width: 370px !important;
+}
+.input-wrap .rs-form-control-wrapper {
+  width: 100%;
+}
+.input-wrap .task-input {
+  width: 100%;
+}
+.input-wrap .rs-form-control-wrapper > .rs-input {
+  width: 100%;
+}
+.view__tasks .tasks-borders {
+  border: solid #d5d5d5;
+  border-width: 0px;
+  border-right-width: 1.5px;
+  border-left-width: 1.5px;
+}
+@keyframes App-logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}

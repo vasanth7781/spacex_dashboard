@@ -1,13 +1,13 @@
 import Axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios';
-import { API_ROOT, AUTH_HEADER_NAME } from '../constant';
-import { forEach, isNil, omit } from 'ramda';
+import { API_ROOT } from '../constant';
+import { omit } from 'ramda';
 import { APIError } from './types';
 
 interface RequestConfig extends AxiosRequestConfig {
   validationErrors?: APIError[];
 }
 
-type ConfigField = 'headers' | 'data' | 'params' | 'method' | 'url'| 'body';
+type ConfigField = 'headers' | 'data' | 'params' | 'method' | 'url' | 'body';
 /**
  * setToken
  *
@@ -17,21 +17,21 @@ type ConfigField = 'headers' | 'data' | 'params' | 'method' | 'url'| 'body';
  */
 export const setToken = (token: string) => {
   // token
-  return baseRequest.interceptors.request.use(config => {
+  return baseRequest.interceptors.request.use((config) => {
     return {
       ...config,
       headers: {
         ...config.headers,
-        Authorization: `Bearer ${token}`,
-      },
+        Authorization: `Bearer ${token}`
+      }
     };
   });
 };
 export const removeToken = () => {
-  return baseRequest.interceptors.request.use(config => {
+  return baseRequest.interceptors.request.use((config) => {
     return {
       ...config,
-      headers: omit(['Authorization'], config.headers),
+      headers: omit(['Authorization'], config.headers)
     };
   });
 };
@@ -44,28 +44,23 @@ export const isEmpty = (v: any) =>
   v === undefined ||
   v === null ||
   v.length === 0 ||
-  (typeof v === 'object' &&
-    Object.keys(v).length === 0 &&
-    v.constructor === Object);
+  (typeof v === 'object' && Object.keys(v).length === 0 && v.constructor === Object);
 
 export const baseRequest = Axios.create({
-  baseURL: API_ROOT,
+  baseURL: API_ROOT
 });
 
 /** URL */
 export const setURL = (url: string) => set('url', url);
 
 /** METHOD */
-export const setMethod = (method: 'GET' | 'POST' | 'PUT' | 'DELETE') =>
-  set('method', method);
+export const setMethod = (method: 'GET' | 'POST' | 'PUT' | 'DELETE') => set('method', method);
 
 /** Param */
 export const setParams = (params: any = {}) => set('params', params);
 
 export const setHeaders = (newHeaders: any = {}) => (object: any) => {
-  return !isEmpty(newHeaders)
-    ? { ...object, headers: { ...newHeaders } }
-    : object;
+  return !isEmpty(newHeaders) ? { ...object, headers: { ...newHeaders } } : object;
 };
 
 /**
@@ -83,16 +78,13 @@ export const setData = <T extends {}>(
    * object, after the validation has happened. Use with caution: It was created as a trap door for
    * merging IPv4 addresses and ports in the NodeBalancer creation flow.
    */
-  postValidationTransform?: (v: any) => any,
+  postValidationTransform?: (v: any) => any
 ) => {
   if (!schema) {
     return set('data', data);
   }
 
-  const updatedData =
-    typeof postValidationTransform === 'function'
-      ? postValidationTransform(data)
-      : data;
+  const updatedData = typeof postValidationTransform === 'function' ? postValidationTransform(data) : data;
 
   try {
     return set('data', updatedData);
@@ -100,7 +92,7 @@ export const setData = <T extends {}>(
     return (object: any) => ({
       ...object,
       data: updatedData,
-      validationErrors: JSON.stringify(error),
+      validationErrors: JSON.stringify(error)
     });
   }
 };
@@ -110,7 +102,7 @@ export const setXFilter = (xFilter: any) => {
     !isEmpty(xFilter)
       ? {
           ...object,
-          headers: { ...object.headers, 'X-Filter': JSON.stringify(xFilter) },
+          headers: { ...object.headers, 'X-Filter': JSON.stringify(xFilter) }
         }
       : object;
 };
@@ -131,7 +123,7 @@ export const setXFilter = (xFilter: any) => {
 const reduceRequestConfig = (...fns: Function[]): RequestConfig =>
   fns.reduceRight((result, fn) => fn(result), {
     url: API_ROOT,
-    headers: {},
+    headers: {}
   });
 
 /** Generator */
@@ -139,11 +131,11 @@ export const requestGenerator = <T>(...fns: Function[]): Promise<T> => {
   const config = reduceRequestConfig(...fns);
   if (config.validationErrors) {
     return Promise.reject(
-    config.validationErrors, // All failed requests, client or server errors, should be APIError[]
+      config.validationErrors // All failed requests, client or server errors, should be APIError[]
     );
   }
 
-  return baseRequest(config).then(response => response.data);
+  return baseRequest(config).then((response) => response.data);
   // .catch(err => console.(err.response));
 
   /*
@@ -200,7 +192,7 @@ export const requestGenerator = <T>(...fns: Function[]): Promise<T> => {
 export const mockAPIError = (
   status: number = 400,
   statusText: string = 'Internal Server Error',
-  data: any = {},
+  data: any = {}
 ): Promise<AxiosError> =>
   new Promise((resolve, reject) =>
     setTimeout(
@@ -211,11 +203,11 @@ export const mockAPIError = (
             status,
             statusText,
             headers: {},
-            config: {},
-          }),
+            config: {}
+          })
         ),
-      process.env.NODE_ENV === 'test' ? 0 : 250,
-    ),
+      process.env.NODE_ENV === 'test' ? 0 : 250
+    )
   );
 
 const createError = (message: string, response: AxiosResponse) => {
@@ -229,9 +221,7 @@ interface CancellableRequest<T> {
   cancel: () => void;
 }
 
-export const CancellableRequest = <T>(
-  ...fns: Function[]
-): CancellableRequest<T> => {
+export const CancellableRequest = <T>(...fns: Function[]): CancellableRequest<T> => {
   const config = reduceRequestConfig(...fns);
   const source = Axios.CancelToken.source();
 
@@ -241,17 +231,14 @@ export const CancellableRequest = <T>(
       request: () =>
         Promise.reject({
           config: { ...config, validationErrors: undefined },
-          response: { data: { errors: config.validationErrors } },
-        }),
+          response: { data: { errors: config.validationErrors } }
+        })
     };
   }
 
   return {
     cancel: source.cancel,
-    request: () =>
-      baseRequest({ ...config, cancelToken: source.token }).then(
-        response => response.data,
-      ),
+    request: () => baseRequest({ ...config, cancelToken: source.token }).then((response) => response.data)
   };
 };
 

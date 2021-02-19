@@ -21,6 +21,7 @@ const StyledAppWrapper = styled.div`
   &.app__warpper .header__wrap {
     background-color: #ffffff;
     height: 72px;
+    box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.1);
   }
   &.app__warpper svg {
     margin-top: 25px;

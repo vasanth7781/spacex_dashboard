@@ -81,7 +81,10 @@ const DashBoardWrapper = styled.div`
     border-width: 1px;
     box-shadow: 0px 1px 3px 0px rgba(0, 0, 0, 0.1);
   }
-
+  &.dasboard__wrapper .rs-tag-green,
+  .rs-tag-red {
+    border-radius: 25px;
+  }
   &.dasboard__wrapper .rs-pagination > .rs-pagination-btn-disabled > a,
   .rs-pagination > .rs-pagination-btn-disabled > a:hover,
   .rs-pagination > .rs-pagination-btn-disabled > a:active,
@@ -96,6 +99,9 @@ const DashBoardWrapper = styled.div`
     width: 40px;
     font-weight: 600;
     box-shadow: 0px 1px 3px 0px rgba(0, 0, 0, 0.1);
+    display: flex;
+    justify-content: center;
+    border-radius: 0px;
   }
 `;
 export default compose<any, any>(withState('dashState', 'handleDashboardStateChange', {}))(DashboardLanding);

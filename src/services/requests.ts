@@ -216,12 +216,12 @@ const createError = (message: string, response: AxiosResponse) => {
   return error;
 };
 
-interface CancellableRequest<T> {
+interface CancellableRequestParam<T> {
   request: () => Promise<T>;
   cancel: () => void;
 }
 
-export const CancellableRequest = <T>(...fns: Function[]): CancellableRequest<T> => {
+export const CancellableRequest = <T>(...fns: Function[]): CancellableRequestParam<T> => {
   const config = reduceRequestConfig(...fns);
   const source = Axios.CancelToken.source();
 

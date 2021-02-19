@@ -2,11 +2,12 @@ import React, { useEffect } from 'react';
 import styled from 'styled-components';
 import { withState, compose } from 'recompose';
 import usePaginatedLaunches from 'hooks/usePaginatedLaunches';
-import { GET_LAUNCHES, ZERO, TOTAL_OFFSET_PER_PAGE } from 'features/constants';
+import { GET_LAUNCHES, ZERO, TOTAL_OFFSET_PER_PAGE, ONE } from 'features/constants';
 import TableWrapperLanding from './TableWrapper';
 import getOffset from 'features/utilities/getOffset';
 import PaginationWrapperLanding from './PaginationWrapper';
 import DashboardHeaderLanding from './DashboardHeader';
+import { lensPath, set } from 'ramda';
 
 interface DashBoardStateProps {
   dashState: any;
@@ -18,13 +19,27 @@ type CombinedProps = DashBoardStateProps;
 const DashboardLanding: React.FC<CombinedProps> = (props: CombinedProps) => {
   const { handleDashboardStateChange, dashState } = props;
   const { lauchCall, loading, data } = usePaginatedLaunches();
-  useEffect(() => {
+  const handleIntialCall = () => {
+    handleDashboardStateChange(
+      compose(set(lensPath(['page']), ONE), set(lensPath(['selectedLaunch']), GET_LAUNCHES))(dashState)
+    );
     lauchCall(GET_LAUNCHES, { limit: TOTAL_OFFSET_PER_PAGE, offset: getOffset(TOTAL_OFFSET_PER_PAGE, ZERO) });
+  };
+
+  useEffect(() => {
+    handleIntialCall();
+    // eslint-disable-next-line
   }, []);
+
   return (
     <DashBoardWrapper className={'dasboard__wrapper'}>
       <div className={'dashboard__header'}>
-        <DashboardHeaderLanding />
+        <DashboardHeaderLanding
+          state={dashState}
+          handlePageChangeFn={handleDashboardStateChange}
+          apiCallFn={lauchCall}
+          handleIntialCall={handleIntialCall}
+        />
       </div>
       <div className={'launch-table'}>
         <TableWrapperLanding data={data} loading={loading} />

@@ -10,6 +10,7 @@ interface Props {
 }
 
 type CombinedProps = Props;
+
 const TableWrapperLanding: React.FC<CombinedProps> = (props: CombinedProps) => {
   const { data, loading } = props;
   return (
@@ -50,7 +51,7 @@ const TableWrapperLanding: React.FC<CombinedProps> = (props: CombinedProps) => {
         <Table.HeaderCell className={'table-header'}>Launched status</Table.HeaderCell>
         <Table.Cell dataKey="launch_date_utc">
           {(rowData: any) => {
-            const { status, color } = getStatus(pathOr(true, ['launch_site', 'launch_success'], rowData));
+            const { status, color } = getStatus(pathOr('', ['launch_success'], rowData));
             return (
               <span>
                 <Tag color={color}>{status}</Tag>

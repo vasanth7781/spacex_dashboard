@@ -1,0 +1,25 @@
+.youtube {
+  background: url('/assets/images/youtube.svg');
+  width: 20px;
+  height: 15px;
+}
+.wikipedia {
+  background: url('/assets/images/wikipedia.svg');
+  width: 20px;
+  height: 15px;
+}
+.nasa {
+  background: url('/assets/images/nasa.svg');
+  width: 20px;
+  height: 15px;
+}
+.close {
+  background: url('/assets/images/close.svg');
+  width: 20px;
+  height: 15px;
+}
+.filter {
+  background: url('/assets/images/filter.svg');
+  width: 20px;
+  height: 15px;
+}

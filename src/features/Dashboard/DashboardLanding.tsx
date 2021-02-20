@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import styled from 'styled-components';
+import { useLocation, RouteComponentProps, withRouter } from 'react-router-dom';
 import { withState, compose } from 'recompose';
 import usePaginatedLaunches from 'hooks/usePaginatedLaunches';
 import { GET_LAUNCHES, ZERO, TOTAL_OFFSET_PER_PAGE, ONE } from 'features/constants';
@@ -7,27 +7,51 @@ import TableWrapperLanding from './TableWrapper';
 import getOffset from 'features/utilities/getOffset';
 import PaginationWrapperLanding from './PaginationWrapper';
 import DashboardHeaderLanding from './DashboardHeader';
-import { lensPath, set } from 'ramda';
+import { isEmpty, isNil, lensPath, pathOr, set, omit } from 'ramda';
+import LaunchDetailModalLanding from './LaunchDetailModal';
+import { DashBoardWrapper } from 'features/StyledComponents/DashBoardWrapper';
+import * as qs from 'query-string';
 
 interface DashBoardStateProps {
   dashState: any;
   handleDashboardStateChange: any;
 }
 
-type CombinedProps = DashBoardStateProps;
+type CombinedProps = DashBoardStateProps & RouteComponentProps<{}>;
 
 const DashboardLanding: React.FC<CombinedProps> = (props: CombinedProps) => {
   const { handleDashboardStateChange, dashState } = props;
   const { lauchCall, loading, data } = usePaginatedLaunches();
+  const { search } = useLocation();
+  const parsedQs = qs.parse(search);
   const handleIntialCall = () => {
-    handleDashboardStateChange(
-      compose(set(lensPath(['page']), ONE), set(lensPath(['selectedLaunch']), GET_LAUNCHES))(dashState)
-    );
-    lauchCall(GET_LAUNCHES, { limit: TOTAL_OFFSET_PER_PAGE, offset: getOffset(TOTAL_OFFSET_PER_PAGE, ZERO) });
+    return handleApiCall(pathOr({}, ['queryParam'], dashState));
   };
-
+  const handleApiCall = (qs: any) => {
+    return lauchCall(pathOr(GET_LAUNCHES, ['selectedLaunch'], qs), {
+      ...omit(['selectedLaunch', 'selectedDateFilter'], qs)
+    });
+  };
+  const handleIntitalCallWithQs = (_parsedQs: any) => {
+    handleApiCall(_parsedQs);
+  };
+  const handleUrlChange = (queryString: any) => {
+    const _qs = qs.stringify(queryString);
+    window.history.replaceState(null, '', `?${_qs}`);
+  };
   useEffect(() => {
+    if (!isEmpty(parsedQs) && !isNil(parsedQs)) {
+      handleDashboardStateChange(
+        compose(
+          set(lensPath(['queryParam']), parsedQs),
+          set(lensPath(['selectedLaunch']), pathOr('', ['selectedLaunch'], parsedQs))
+        )(dashState)
+      );
+      handleIntitalCallWithQs(parsedQs);
+      return;
+    }
     handleIntialCall();
+
     // eslint-disable-next-line
   }, []);
 
@@ -36,72 +60,45 @@ const DashboardLanding: React.FC<CombinedProps> = (props: CombinedProps) => {
       <div className={'dashboard__header'}>
         <DashboardHeaderLanding
           state={dashState}
-          handlePageChangeFn={handleDashboardStateChange}
+          handleStateChangeFn={handleDashboardStateChange}
           apiCallFn={lauchCall}
-          handleIntialCall={handleIntialCall}
+          handleIntialCall={handleApiCall}
+          handleUrlChange={handleUrlChange}
         />
       </div>
       <div className={'launch-table'}>
-        <TableWrapperLanding data={data} loading={loading} />
+        <TableWrapperLanding
+          state={dashState}
+          data={data}
+          loading={loading}
+          handleStateChange={handleDashboardStateChange}
+        />
       </div>
       <div className={'dashboard__pagination pt-3'}>
         <PaginationWrapperLanding
           state={dashState}
           handlePageChangeFn={handleDashboardStateChange}
           apiCallFn={lauchCall}
+          handleUrlChange={handleUrlChange}
         />
       </div>
+      <LaunchDetailModalLanding
+        state={dashState}
+        handleUrlChange={handleUrlChange}
+        handleStateChange={handleDashboardStateChange}
+      />
     </DashBoardWrapper>
   );
 };
-const DashBoardWrapper = styled.div`
-  &.dasboard__wrapper {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
-  }
-  &.dasboard__wrapper .dashboard__pagination {
-    width: 900px;
-    text-align: end;
-  }
-  &.dasboard__wrapper .dashboard__header {
-    width: 900px;
-  }
-  &.dasboard__wrapper .dashboard__header .dashboard-header {
-    width: 900px;
-    display: flex;
-    justify-content: space-between;
-  }
 
-  &.dasboard__wrapper .launch-table {
-    border: solid;
-    border-color: #e4e4e7;
-    border-width: 1px;
-    box-shadow: 0px 1px 3px 0px rgba(0, 0, 0, 0.1);
-  }
-  &.dasboard__wrapper .rs-tag-green,
-  .rs-tag-red {
-    border-radius: 25px;
-  }
-  &.dasboard__wrapper .rs-pagination > .rs-pagination-btn-disabled > a,
-  .rs-pagination > .rs-pagination-btn-disabled > a:hover,
-  .rs-pagination > .rs-pagination-btn-disabled > a:active,
-  .rs-pagination > .rs-pagination-btn-disabled > a:focus,
-  .rs-pagination > li:not(.rs-pagination-btn-disabled) > a,
-  .rs-pagination > li.rs-pagination-btn-active > a {
-    border: solid;
-    border-width: 1px;
-    border-color: #e4e4e7;
-    padding: 10px;
-    height: 40px;
-    width: 40px;
-    font-weight: 600;
-    box-shadow: 0px 1px 3px 0px rgba(0, 0, 0, 0.1);
-    display: flex;
-    justify-content: center;
-    border-radius: 0px;
-  }
-`;
-export default compose<any, any>(withState('dashState', 'handleDashboardStateChange', {}))(DashboardLanding);
+export default compose<any, any>(
+  withState('dashState', 'handleDashboardStateChange', {
+    selectedLaunch: GET_LAUNCHES,
+    page: ONE,
+    queryParam: {
+      limit: TOTAL_OFFSET_PER_PAGE,
+      offset: getOffset(TOTAL_OFFSET_PER_PAGE, ZERO)
+    }
+  }),
+  withRouter
+)(DashboardLanding);

@@ -12,6 +12,7 @@ interface Props {
   handleStateChange: any;
   handleUrlChange: any;
 }
+
 const LaunchDetailModalLanding: React.FC<Props> = (props: Props) => {
   const { state, handleStateChange } = props;
   const handleStateComposeChange = (setFns: any) => {

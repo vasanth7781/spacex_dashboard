@@ -30,18 +30,20 @@ import Request, { setMethod, setParams, setURL } from 'services/requests' so we 
 5. setHeader -- for setting the header to an api calls,it will be sent as object key-value pairs
 6. setXFilter -- for setting the filter in header using X-**-** ,it also will be sent as object key-value pairs
 
-**Example usage **
-`
+**Example usage**
+
+```
 import { API_ROOT, GET_REQUEST_NAME } from 'constant';
 import Request, { setMethod, setParams, setURL } from 'services/requests';
 
-/\*\*
+/*
 
 - getLaunches -service call to get all launches resources
 - @param queryParam -can have query params as object {..} it cna be optional
-  \*/
+*/
 
 export const getLaunches = (queryParam?: any) =>
 Request(setURL(`${API_ROOT}/launches`), setMethod(GET_REQUEST_NAME), setParams(queryParam));
-`
+```
+
 [Axios](https://www.npmjs.com/package/axios) is used for making api call,instead axios will be setup and the remaing paramters will be set while runtime usage of api functions

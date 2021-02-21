@@ -27,6 +27,9 @@ const DashboardLanding: React.FC<CombinedProps> = (props: CombinedProps) => {
   const handleIntialCall = () => {
     return handleApiCall(pathOr({}, ['queryParam'], dashState));
   };
+  /* Here all the query params are sent as second params ,
+  omiting  some params as its used for internal purpose
+  */
   const handleApiCall = (qs: any) => {
     return lauchCall(pathOr(GET_LAUNCHES, ['selectedLaunch'], qs), {
       ...omit(['selectedLaunch', 'selectedDateFilter'], qs)
@@ -39,6 +42,10 @@ const DashboardLanding: React.FC<CombinedProps> = (props: CombinedProps) => {
     const _qs = qs.stringify(queryString);
     window.history.replaceState(null, '', `?${_qs}`);
   };
+  /*
+  initally if query params as some filter parameter we load it from then,
+  if not load from defaults state
+  */
   useEffect(() => {
     if (!isEmpty(parsedQs) && !isNil(parsedQs)) {
       handleDashboardStateChange(

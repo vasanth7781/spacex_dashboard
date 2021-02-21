@@ -5,6 +5,9 @@ export const UPCOMING_LAUNCHES_CALL = 'upcoming_launches';
 export const PAST_LAUNCHES_CALL = 'past_launches';
 export const FAIL_LAUNCHES_CALL = 'fail_launches';
 export const SUCESS_LAUNCHES_CALL = 'success_launches';
+/* Here one assumption made was we have set toal number of datas as 250,
+  since to calculate number of pages and to show it in user,
+  it was not returned from api ,so assumption has been made */
 export const TOTAL_NUMBER_OF_DATAS = 250;
 export const TOTAL_OFFSET_PER_PAGE = 25;
 export const ZERO = 0;
@@ -72,5 +75,8 @@ export const TYPE_OF_DATE_FILTERS = [
     value: PAST_2_YEAR
   }
 ];
-
+/**
+ * mapIndexed - this method will return the map with index,since index was
+ *  not given by map function of ramda
+ */
 export const mapIndexed = addIndex(map);

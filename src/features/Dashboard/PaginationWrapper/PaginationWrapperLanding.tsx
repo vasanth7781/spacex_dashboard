@@ -25,6 +25,9 @@ const PaginationWrapperLanding: React.FC<CombinedProps> = (props: CombinedProps)
     handleUrlChange(queryParams);
     apiCallFn(pathOr('', ['selectedLaunch'], state), queryParams);
   };
+  /* Here one assumption made was we have set toal number of datas as 250,
+  since to calculate number of pages and to show it in user,it was not returned from api ,
+  so assumption has been made */
   return (
     <Pagination
       prev={true}

@@ -25,6 +25,11 @@ interface Props {
 const DashboardHeaderLanding: React.FC<Props> = (props: Props) => {
   const { handleStateChangeFn, apiCallFn, state, handleIntialCall, handleUrlChange } = props;
 
+  /*
+  this function is for handling upcoming,failure launches,etc.., filters,so if its default means
+  we dont do any api calls,if its changes from default then forming the state and updating state
+  queryparams of url and making an api call using updated values
+  */
   const handleLauncheSelect = (value: string, item: any, e: any) => {
     if (equals(value, DEFAULT_NAME)) {
       return;
@@ -39,7 +44,6 @@ const DashboardHeaderLanding: React.FC<Props> = (props: Props) => {
     const updatedState = compose(
       set(lensPath(['page']), ONE),
       set(lensPath(['selectedLaunch']), pathOr('', ['value'], item)),
-
       set(lensPath(['queryParam', 'limit']), TOTAL_OFFSET_PER_PAGE),
       set(lensPath(['queryParam', 'offset']), offset),
       set(lensPath(['queryParam', 'selectedLaunch']), pathOr('', ['value'], item))
@@ -48,7 +52,10 @@ const DashboardHeaderLanding: React.FC<Props> = (props: Props) => {
     handleUrlChange(updatedQuerParams);
     apiCallFn(pathOr('', ['value'], item), omit(['selectedLaunch', 'selectedDateFilter'], updatedQuerParams));
   };
-
+  /*
+  this function is for handling past month,past 3 monrth launches,etc..,date filters,date filters are changes by forming the state and updating state
+  queryparams of url and making an api call using updated values
+  */
   const getDatesFn = (startDate: string, lastDate: string, dateFilterKey: any) => {
     const updatedQueryParams = compose(
       set(lensPath(['queryParam', 'start']), startDate),
@@ -67,6 +74,10 @@ const DashboardHeaderLanding: React.FC<Props> = (props: Props) => {
   const handleDateSelection = (value: string, item: any, e: any) => {
     return getDiffDates(pathOr('', ['value'], item), getDatesFn);
   };
+  /*
+this method used for handling clearing filters of upcoming,success launches,etc..,
+then removing the appropirate values from state and make an api call with cleared filters
+*/
   const handleCloseFilter = () => {
     const queryParams = {
       ...omit(['selectedLaunch'], pathOr({}, ['queryParam'], state)),
@@ -80,6 +91,10 @@ const DashboardHeaderLanding: React.FC<Props> = (props: Props) => {
     handleStateChangeFn(updatedState);
     handleIntialCall(queryParams);
   };
+  /*
+this method used for handling clearing filters of date selection
+then removing the appropirate date filters values from state and make an api call with cleared filters
+*/
   const handleDateFilterClose = () => {
     const queryParams = {
       ...omit(['start', 'end', 'selectedDateFilter'], pathOr({}, ['queryParam'], state))
@@ -89,6 +104,7 @@ const DashboardHeaderLanding: React.FC<Props> = (props: Props) => {
     handleUrlChange(queryParams);
     handleIntialCall(queryParams);
   };
+
   return (
     <div className={'dashboard-header py-5'}>
       <div>

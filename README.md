@@ -1,4 +1,3 @@
-# bigbinary-interview-for-vasanth7781
 
 # Setup for local development
 
